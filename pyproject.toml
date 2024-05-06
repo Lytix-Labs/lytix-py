@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lytix-py"
-version = "1.0.0"
+version = "1.1.0"
 authors = [
   { name="Lytix", email="support@lytix.com" },
 ]
@@ -17,8 +17,8 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-  requests==2.31.0
-  urllib3==2.2.1
+  "requests==2.31.0",
+  "urllib3==2.2.1",
 ]
 
 [project.urls]

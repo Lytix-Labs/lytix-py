@@ -43,3 +43,17 @@ class MetricCollector:
             "metadata": metricMetadata
         }
         self._sendPostRequest("increment", body)
+
+    """
+    Capture a model input/output
+    """
+    def captureModelIO(self, modelName: str, userInput: str, modelOutput: str, metricMetadata: dict = None):
+        if metricMetadata is None:
+            metricMetadata = {}
+        body = {
+            "modelName": modelName,
+            "userInput": userInput,
+            "modelOutput": modelOutput,
+            "metadata": metricMetadata
+        }
+        self._sendPostRequest("modelIO", body)
