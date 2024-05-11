@@ -2,12 +2,13 @@ import requests
 from urllib.parse import urljoin
 from lytix_py.envVars import LX_API_KEY, LX_BASE_URL
 import os.path
+import time
 
 """
  Main class to collect and report metrics
  back to HQ
 """
-class MetricCollector:
+class _MetricCollector:
     _apiKey: str = None
     _baseURL: str = None
     # _logger: str = None
@@ -54,6 +55,26 @@ class MetricCollector:
             "modelName": modelName,
             "userInput": userInput,
             "modelOutput": modelOutput,
-            "metadata": metricMetadata
+            "metricMetadata": metricMetadata
         }
         self._sendPostRequest("modelIO", body)
+
+    """
+    Capture a model io event while also capturing the time to respond
+    """
+    def captureModelTrace(self, modelName: str, userInput: str, callback, metricMetadata: dict = None):
+        startTime = time.time()
+        modelOutput = callback()
+        try:
+            responseTime = int((time.time() - startTime) * 1000)  # Convert to milliseconds
+            # Capture modelIO event along with the response time
+            self.captureModelIO(modelName, userInput, modelOutput, metricMetadata)
+            self.increment("model.responseTime", responseTime, {"modelName": modelName})
+        except Exception as err:
+            self.logger.error(f"Failed to capture model trace: {err}", err, modelName, userInput)
+            raise err
+        finally:
+            return modelOutput
+
+MetricCollector = _MetricCollector()
+
