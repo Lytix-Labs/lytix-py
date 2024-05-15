@@ -66,7 +66,7 @@ class _MetricCollector:
     """
     Capture a model io event while also capturing the time to respond
     """
-    def captureModelTrace(self, modelName: str, userInput: str, callback, metricMetadata: dict = None):
+    def captureModelTrace(self, modelName: str, userInput: str, callback, metricMetadata: dict = {}):
         if LytixCreds.LX_API_KEY is None: 
             return callback()
 
@@ -76,7 +76,7 @@ class _MetricCollector:
             responseTime = int((time.time() - startTime) * 1000)  # Convert to milliseconds
             # Capture modelIO event along with the response time
             self.captureModelIO(modelName, userInput, modelOutput, metricMetadata)
-            self.increment("model.responseTime", responseTime, {"modelName": modelName})
+            self.increment("model.responseTime", responseTime, {"modelName": modelName}.update(metricMetadata))
         except Exception as err:
             self.logger.error(f"Failed to capture model trace: {err}", err, modelName, userInput)
             raise err
