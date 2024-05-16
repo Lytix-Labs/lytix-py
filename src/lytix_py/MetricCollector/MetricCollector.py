@@ -49,7 +49,7 @@ class _MetricCollector:
     """
     Capture a model input/output
     """
-    def captureModelIO(self, modelName: str, userInput: str, modelOutput: str, metricMetadata: dict = None):
+    def captureModelIO(self, modelName: str, modelInput: str, modelOutput: str, metricMetadata: dict = None, userIdentifier = None, sessionId = None):
         if LytixCreds.LX_API_KEY is None: 
             return 
 
@@ -57,16 +57,18 @@ class _MetricCollector:
             metricMetadata = {}
         body = {
             "modelName": modelName,
-            "userInput": userInput,
+            "modelInput": modelInput,
             "modelOutput": modelOutput,
-            "metricMetadata": metricMetadata
+            "metricMetadata": metricMetadata,
+            "userIdentifier": userIdentifier,
+            "sessionId": sessionId
         }
         self._sendPostRequest("modelIO", body)
 
     """
     Capture a model io event while also capturing the time to respond
     """
-    def captureModelTrace(self, modelName: str, userInput: str, callback, metricMetadata: dict = {}):
+    def captureModelTrace(self, modelName: str, modelInput: str, callback, metricMetadata: dict = {}, userIdentifier = None, sessionId = None):
         if LytixCreds.LX_API_KEY is None: 
             return callback()
 
@@ -75,10 +77,10 @@ class _MetricCollector:
         try:
             responseTime = int((time.time() - startTime) * 1000)  # Convert to milliseconds
             # Capture modelIO event along with the response time
-            self.captureModelIO(modelName, userInput, modelOutput, metricMetadata)
+            self.captureModelIO(modelName, modelInput, modelOutput, metricMetadata, userIdentifier, sessionId)
             self.increment("model.responseTime", responseTime, {"modelName": modelName}.update(metricMetadata))
         except Exception as err:
-            self.logger.error(f"Failed to capture model trace: {err}", err, modelName, userInput)
+            self.logger.error(f"Failed to capture model trace: {err}", err, modelName, modelInput)
             raise err
         finally:
             return modelOutput
