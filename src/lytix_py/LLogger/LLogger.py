@@ -15,29 +15,30 @@ class LLogger:
     """
     def __init__(self, loggerName: str, metadata: dict = None):
         self.logger = logging.getLogger(loggerName)
+        if not len(self.logger.handlers):
+            hostname = socket.gethostname()
+
+            """
+            Setup formatting and logging config
+            """
+            self.logger.setLevel('INFO')
+            fmt = '{"time": "%(asctime)s.%(msecs)03d",  "hostname": "' + hostname + '",  "level": "%(levelname)s", "msg": "%(message)s",  "name": "%(name)s", "pid": "%(process)d"}'
+
+            datefmt="%Y-%m-%d,%H:%M:%S"
+            formatter = logging.Formatter(fmt, datefmt)
+            handler = logging.StreamHandler(stream=sys.stdout)
+            handler.setFormatter(formatter)
+            self.logger.addHandler(handler)
+
+            progress = LLoggerStreamWrapper()
+            progress.setFormatter(formatter)
+            self.logger.addHandler(progress)
+        
 
         """
         Define our async store to store recent logs
         """
         self.asyncStore = LAsyncStore
-
-        hostname = socket.gethostname()
-
-        """
-        Setup formatting and logging config
-        """
-        self.logger.setLevel('INFO')
-        fmt = '{"time": "%(asctime)s.%(msecs)03d",  "hostname": "' + hostname + '",  "level": "%(levelname)s", "msg": "%(message)s",  "name": "%(name)s", "pid": "%(process)d"}'
-
-        datefmt="%Y-%m-%d,%H:%M:%S"
-        formatter = logging.Formatter(fmt, datefmt)
-        handler = logging.StreamHandler(stream=sys.stdout)
-        handler.setFormatter(formatter)
-        self.logger.addHandler(handler)
-
-        progress = LLoggerStreamWrapper()
-        progress.setFormatter(formatter)
-        self.logger.addHandler(progress)
 
         if (metadata): 
             self.metadata = metadata
