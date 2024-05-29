@@ -10,10 +10,11 @@ from lytix_py.envVars import LytixCreds
 """
 class _MetricCollector:
     _baseURL: str = None
-    # _logger: str = None
+    processing_metric_mutex: int = 0
 
     def __init__(self):
         self._baseURL = urljoin(LytixCreds.LX_BASE_URL, "/v1/metrics")
+        self.processing_metric_mutex = 0
         pass
 
 
@@ -84,6 +85,24 @@ class _MetricCollector:
             raise err
         finally:
             return modelOutput
+
+    """
+    Capture a metric trace event
+    @note You likeley never need to call this directly
+    """
+    def _captureMetricTrace(self, metricName: str, metricValue: int, metricMetadata: dict = {}, logs: list = []):
+        self.processing_metric_mutex += 1
+
+        body = {
+            "metricName": metricName,
+            "metricValue": metricValue,
+            "metricMetadata": metricMetadata,
+            "logs": logs
+        }
+
+        self._sendPostRequest("increment", body)
+
+        self.processing_metric_mutex -= 1
 
 MetricCollector = _MetricCollector()
 

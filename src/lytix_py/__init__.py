@@ -1,3 +1,5 @@
 from .MetricCollector.MetricCollector import MetricCollector
-from .LLLogger.LLLogger import LLLogger
+from .LLogger.LLogger import LLogger
 from .envVars import LytixCreds
+from .LError import LErrorIncrement, LError
+
