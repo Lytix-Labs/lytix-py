@@ -309,6 +309,9 @@ class LytixWrapper:
             stack = _lytixTestContext.get().copy()
             stack["testsToRun"] = testsToRun
             stack["traceId"] = str(uuid.uuid4())
+            stack["modelOutput"] = None
+            stack["modelInput"] = None
+            stack["modelName"] = None
             _lytixTestContext.set(stack)
 
             return {"traceId": stack["traceId"]}
@@ -323,6 +326,10 @@ class LytixWrapper:
             stack = _lytixTraceContext.get().copy()
             stack["modelName"] = modelName
             stack["traceId"] = str(uuid.uuid4())
+            stack["modelOutput"] = None
+            stack["modelInput"] = None
+            stack["userIdentifier"] = None
+            stack["sessionId"] = None
             _lytixTraceContext.set(stack)
 
             return {"traceId": stack["traceId"]}

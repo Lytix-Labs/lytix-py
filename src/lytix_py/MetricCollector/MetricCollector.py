@@ -106,8 +106,8 @@ class _MetricCollector:
             "modelInput": modelInput,
             "modelOutput": modelOutput,
             "metricMetadata": metricMetadata,
-            "userIdentifier": userIdentifier,
-            "sessionId": sessionId,
+            "userIdentifier": str(userIdentifier),
+            "sessionId": str(sessionId),
             "logs": logs,
         }
         self._sendPostRequest("modelIO", body)
