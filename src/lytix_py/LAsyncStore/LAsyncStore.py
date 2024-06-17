@@ -7,6 +7,7 @@ class LAsyncStoreClass:
 
     def __init__(self):
         self.lytix_context_store = contextvars.ContextVar('lytix-context-store', default={'logs': []})
+        self.httpMiddleware = False
 
     """
     Set our context store
@@ -30,7 +31,6 @@ class LAsyncStoreClass:
     Get logs from our async store
     """
     def getLogs(self):
-        print(f'herere, {self.httpMiddleware}, {getLytixContext()}')
         if (self.httpMiddleware):
             return getLytixContext()['logs']
         else:

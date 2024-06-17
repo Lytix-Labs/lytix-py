@@ -4,7 +4,7 @@ import socket
 import sys
 from typing import Mapping
 
-from lytix_py.LAsyncStore.LAsyncStore import LAsyncStore
+from lytix_py.LAsyncStore.LAsyncStore import LAsyncStore, LAsyncStoreClass
 from lytix_py.LLogger.LLoggerStreamWrapper import LLoggerStreamWrapper
 
 class LLogger:
@@ -13,7 +13,7 @@ class LLogger:
     """
     @param config: Optional dict of the following shape: { console: boolean }
     """
-    def __init__(self, loggerName: str, metadata: dict = None):
+    def __init__(self, loggerName: str, metadata: dict = None, asyncStore: LAsyncStoreClass = None):
         self.logger = logging.getLogger(loggerName)
         if not len(self.logger.handlers):
             hostname = socket.gethostname()
@@ -30,7 +30,7 @@ class LLogger:
             handler.setFormatter(formatter)
             self.logger.addHandler(handler)
 
-            progress = LLoggerStreamWrapper()
+            progress = LLoggerStreamWrapper(customAsyncStore=asyncStore)
             progress.setFormatter(formatter)
             self.logger.addHandler(progress)
         
@@ -38,7 +38,10 @@ class LLogger:
         """
         Define our async store to store recent logs
         """
-        self.asyncStore = LAsyncStore
+        if asyncStore:
+            self.asyncStore = asyncStore
+        else:
+            self.asyncStore = LAsyncStore
 
         if (metadata): 
             self.metadata = metadata
