@@ -1,6 +1,7 @@
 import asyncio
 from collections import defaultdict
 import contextvars
+import copy
 from functools import wraps
 import logging
 import time
@@ -192,8 +193,8 @@ class LytixWrapper:
         """
         MetricCollector.captureModelIO(
             modelName=modelName,
-            modelInput=modelInput,
-            modelOutput=modelOutput,
+            modelInput=copy.deepcopy(modelInput),
+            modelOutput=copy.deepcopy(modelOutput),
             userIdentifier=userIdentifier,
             sessionId=sessionId,
             modelResponseTime=responseTime,
