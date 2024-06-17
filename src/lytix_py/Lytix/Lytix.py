@@ -162,7 +162,7 @@ class LytixWrapper:
 
         return cast(F, asyncDecorator)
 
-    def reportModelIO(self, responseTime: int, traceContexT: dic):
+    def reportModelIO(self, responseTime: int, traceContexT: dict):
         """
         Reports model input and output to HQ
         """
