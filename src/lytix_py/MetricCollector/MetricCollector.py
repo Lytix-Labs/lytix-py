@@ -21,8 +21,8 @@ class _MetricCollector:
     processing_metric_mutex: int = 0
 
     def __init__(self):
-        self._baseURL = urljoin(LytixCreds.LX_BASE_URL, "/v1/metrics")
-        self._baseTestURL = urljoin(LytixCreds.LX_BASE_URL, "/v1/test")
+        self._baseURL = urljoin(LytixCreds.LX_BASE_URL, "/v2/metrics")
+        self._baseTestURL = urljoin(LytixCreds.LX_BASE_URL, "/v2/test")
         self.processing_metric_mutex = 0
         pass
 
@@ -88,8 +88,7 @@ class _MetricCollector:
     def captureModelIO(
         self,
         modelName: str,
-        modelInput: str,
-        modelOutput: str,
+        messages: List[dict],
         metricMetadata: dict = None,
         userIdentifier=None,
         sessionId=None,
@@ -103,8 +102,7 @@ class _MetricCollector:
             metricMetadata = {}
         body = {
             "modelName": modelName,
-            "modelInput": modelInput,
-            "modelOutput": modelOutput,
+            "messages": messages,
             "metricMetadata": metricMetadata,
             "userIdentifier": str(userIdentifier),
             "sessionId": str(sessionId),
@@ -195,8 +193,7 @@ class _MetricCollector:
 
     def _kickoffTestRun(
         self,
-        input: str,
-        output: str,
+        messages: List[dict],
         testsToRun: List[str],
         traceId: str,
         testSuiteId: str,
@@ -208,8 +205,7 @@ class _MetricCollector:
         self.processing_metric_mutex += 1
 
         body = {
-            "input": input,
-            "output": output,
+            "messages": messages,
             "testsToRun": testsToRun,
             "traceId": traceId,
             "testSuiteId": testSuiteId,
