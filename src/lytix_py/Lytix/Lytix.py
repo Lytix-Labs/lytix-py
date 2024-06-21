@@ -22,8 +22,7 @@ _lytixTestContext: contextvars.ContextVar[DefaultDict[str, str]] = (
             lambda: {
                 "traceId": None,
                 "modelName": None,
-                "modelInput": None,
-                "modelOutput": None,
+                "messages": None,
             },
         ),
     )
@@ -36,8 +35,7 @@ _lytixTraceContext: contextvars.ContextVar[DefaultDict[str, str]] = (
             lambda: {
                 "traceId": None,
                 "modelName": None,
-                "modelInput": None,
-                "modelOutput": None,
+                "messages": None,
                 "userIdentifier": None,
                 "sessionId": None,
             },
@@ -171,13 +169,12 @@ class LytixWrapper:
         if not valid:
             return
 
-        modelInput = context["modelInput"]
-        modelOutput = context["modelOutput"]
+        messages = context["messages"]
         modelName = context["modelName"]
 
-        if modelInput is None or modelOutput is None or modelName is None:
+        if messages is None or modelName is None:
             self._logger.error(
-                "Missing modelInput, modelOutput, or modelName in context, make sure you have setup the correct decorator"
+                "Missing messages or modelName in context, make sure you have setup the correct decorator"
             )
             return
 
@@ -192,8 +189,7 @@ class LytixWrapper:
         """
         MetricCollector.captureModelIO(
             modelName=modelName,
-            modelInput=modelInput,
-            modelOutput=modelOutput,
+            messages=messages,
             userIdentifier=userIdentifier,
             sessionId=sessionId,
             modelResponseTime=responseTime,
@@ -252,11 +248,10 @@ class LytixWrapper:
         """
         Validate we have everything we need
         """
-        input = context["modelInput"]
-        output = context["modelOutput"]
+        messages = context["messages"]
         testsToRun = context["testsToRun"]
         traceId = context["traceId"]
-        if input is None or output is None or testsToRun is None or traceId is None:
+        if messages is None or testsToRun is None or traceId is None:
             self._logger.error(
                 "Missing input, output, testsToRun, or traceId in context, make sure you have setup the correct decorator"
             )
@@ -266,7 +261,7 @@ class LytixWrapper:
         Start the test
         """
         testRunIds = MetricCollector._kickoffTestRun(
-            input, output, testsToRun, traceId, testSuiteId, testName
+            messages, testsToRun, traceId, testSuiteId, testName
         )
 
         if testRunIds is False:
@@ -360,36 +355,23 @@ class LytixWrapper:
             return {}, False
         return existingContext, True
 
-    def setOutput(self, modelOutput: str):
-        """
-        Sets model output in the current context
-        """
-        # Try to set on Test context
-        context, valid = self._getTestContext()
-        if valid:
-            context["modelOutput"] = modelOutput
-            _lytixTestContext.set(context)
-
-        #  Then set on trace context
-        context, valid = self._getTraceContext()
-        if valid:
-            context["modelOutput"] = modelOutput
-            _lytixTraceContext.set(context)
-
-    def setInput(self, modelInput: str):
+    def setMessage(self, message: str, role: str):
         """
         Sets model input in the current context
+        @param role: One of 'user', 'system', 'assistant'
         """
+        messageToAdd = {"role": role, "content": message}
+
         # Try to set on Test context
         context, valid = self._getTestContext()
         if valid:
-            context["modelInput"] = modelInput
+            context["messages"].append(messageToAdd)
             _lytixTestContext.set(context)
 
         #  Then set on trace context
         context, valid = self._getTraceContext()
         if valid:
-            context["modelInput"] = modelInput
+            context["messages"].append(messageToAdd)
             _lytixTraceContext.set(context)
 
     def setUserIdentifier(self, userIdentifier: str):

@@ -15,7 +15,7 @@ async def test1():
 @lytix.test(testsToRun=["No Profanity Test"])
 def test2():
     modelInput = "test2-input"
-    modelOutput = "This should fucking fail"
+    modelOutput = "Shit, This should fail"
     lytix.setOutput(modelOutput)
     lytix.setInput(modelInput)
 
@@ -23,7 +23,7 @@ def test2():
 @lytix.test(testsToRun=["No Profanity Test"])
 def test3():
     modelInput = "test3-input"
-    modelOutput = "You are stupid"
+    modelOutput = "You are stupid, but this should pass"
     lytix.setOutput(modelOutput)
     lytix.setInput(modelInput)
 
