@@ -1,5 +1,5 @@
 import asyncio
-from lytix_py.Lytix.Lytix import lytix, _lytixTraceContext
+from lytix_py.Lytix.Lytix import lytix
 
 
 userInput = "Whats the capital of France?"
@@ -14,14 +14,12 @@ async def getResponse(logger):
     modelOutput = "111Paris is the capital of france1111"
 
     # Set our defined params however we want
-    lytix.setInput(userInput)
-    lytix.setOutput(modelOutput)
+    lytix.setMessage(userInput, "user")
+    lytix.setMessage(modelOutput, "assistant")
 
     # Optional values
     lytix.setUserIdentifier("testUser")
     lytix.setSessionId("testSession")
-
-    print(f"FirstCall", _lytixTraceContext.get())
 
     return modelOutput
 
@@ -31,13 +29,12 @@ async def getResponse2(logger):
     modelOutput = "2222Paris is the capital of france2222"
 
     # Set our defined params however we want
-    lytix.setInput(userInput)
-    lytix.setOutput(modelOutput)
+    lytix.setMessage(userInput, "user")
+    lytix.setMessage(modelOutput, "assistant")
 
     # Optional values
     lytix.setUserIdentifier("testUser")
     lytix.setSessionId("testSession")
-    print(f"SecondCall", _lytixTraceContext.get())
 
 
 async def main():

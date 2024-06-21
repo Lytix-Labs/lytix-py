@@ -5,7 +5,7 @@ import sys
 import threading
 import time
 import uuid
-from lytix_py.Lytix.Lytix import lytix
+from lytix_py.Lytix.LytixTest import lytixTest
 from lytix_py.MetricCollector.MetricCollector import MetricCollector
 from lytix_py.colors import colors
 
@@ -21,8 +21,7 @@ async def runTestSuite():
     Gather all @lytix.test decorators present and
     run the test suite
     """
-    allTests = lytix._testState
-    testGroupId = str(uuid.uuid4())
+    allTests = lytixTest._testState
 
     print(
         f"{colors.GREEN}Starting test suite for: {len(allTests)} test(s)...{colors.RESET}"
@@ -69,7 +68,7 @@ async def runTestSuite():
     for func in asyncFunctions:
         functionName = func["function"].__name__
 
-        @lytix.test(
+        @lytixTest.test(
             **func["testArgs"], _testSuiteId=testSuiteId, _testName=functionName
         )
         async def wrapper(*args, **kwargs):
@@ -94,7 +93,7 @@ async def runTestSuite():
     for func in syncFunctions:
         functionName = func["function"].__name__
 
-        @lytix.test(
+        @lytixTest.test(
             **func["testArgs"], _testSuiteId=testSuiteId, _testName=functionName
         )
         def wrapper(*args, **kwargs):
