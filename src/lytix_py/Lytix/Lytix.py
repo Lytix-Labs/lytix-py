@@ -77,7 +77,7 @@ class LytixWrapper:
             """
             If we have model IO set, send it to HQ
             """
-            self.reportModelIO(responseTime, traceContext)
+            self.reportModelIO(responseTime)
 
             return result
 
@@ -100,7 +100,7 @@ class LytixWrapper:
             """
             If we have model IO set, send it to HQ
             """
-            self.reportModelIO(responseTime, traceContext)
+            self.reportModelIO(responseTime)
 
             return result
 
