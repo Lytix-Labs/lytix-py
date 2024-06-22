@@ -1,5 +1,5 @@
 import asyncio
-from lytix_py.Lytix.Lytix import lytix
+from lytix_py import lytix
 
 
 userInput = "Whats the capital of France?"

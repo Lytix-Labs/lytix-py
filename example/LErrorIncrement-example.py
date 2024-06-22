@@ -1,5 +1,4 @@
-from lytix_py.LError import LErrorIncrement
-from lytix_py.LLogger.LLogger import LLogger
+from lytix_py import LErrorIncrement, LLogger
 
 
 async def backgroundProcess():

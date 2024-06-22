@@ -1,6 +1,6 @@
 import asyncio
 
-from lytix_py.Lytix.LytixTest import lytixTest
+from lytix_py import lytixTest
 from lytix_py.Lytix.RunTestSuite import runTestSuite
 
 
