@@ -25,6 +25,7 @@ _lytixTraceContext: contextvars.ContextVar[DefaultDict[str, str]] = (
                 "messages": None,
                 "userIdentifier": None,
                 "sessionId": None,
+                "backingModelId": None,
             },
         ),
     )
@@ -129,6 +130,7 @@ class LytixWrapper:
         """
         userIdentifier = context["userIdentifier"]
         sessionId = context["sessionId"]
+        backingModelId = context["backingModelId"]
 
         """
         Send to HQ
@@ -139,6 +141,7 @@ class LytixWrapper:
             userIdentifier=userIdentifier,
             sessionId=sessionId,
             modelResponseTime=responseTime,
+            backingModelId=backingModelId,
         )
 
     def _prepTraceDecoratorContext(self, modelName: str) -> dict:
@@ -198,6 +201,16 @@ class LytixWrapper:
         context, valid = self._getTraceContext()
         if valid:
             context["sessionId"] = sessionId
+            _lytixTraceContext.set(context)
+
+    def setBackingModel(self, backingModelId: str):
+        """
+        Sets backing model id in the current context
+        (e.g. "GPT_3_5_TURBO" | "GPT_4" | "LLAMA_3_8B_INSTRUCT" | "LLAMA_3_70B_INSTRUCT" | "MISTRAL_7B_INSTRUCT" | "MISTRAL_8X7B_INSTRUCT")
+        """
+        context, valid = self._getTraceContext()
+        if valid:
+            context["backingModelId"] = backingModelId
             _lytixTraceContext.set(context)
 
 

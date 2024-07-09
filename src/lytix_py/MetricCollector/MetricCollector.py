@@ -77,7 +77,7 @@ class _MetricCollector:
         body = {
             "metricName": metricName,
             "metricValue": metricValue,
-            "metadata": metricMetadata,
+            "metricMetadata": metricMetadata,
         }
         self._sendPostRequest("increment", body)
 
@@ -94,6 +94,7 @@ class _MetricCollector:
         sessionId=None,
         logs: list[str] = [],
         modelResponseTime: int = None,
+        backingModelId: str = None,
     ):
         if LytixCreds.LX_API_KEY is None:
             return
@@ -107,14 +108,10 @@ class _MetricCollector:
             "userIdentifier": str(userIdentifier),
             "sessionId": str(sessionId),
             "logs": logs,
+            "modelResponseTime": modelResponseTime,
+            "backingModelId": backingModelId,
         }
         self._sendPostRequest("modelIO", body)
-        if modelResponseTime is not None:
-            self.increment(
-                "model.responseTime",
-                modelResponseTime,
-                {"modelName": modelName}.update(metricMetadata),
-            )
 
     """
     Capture a model io event while also capturing the time to respond

@@ -35,6 +35,9 @@ async def getResponse2(logger):
     # Optional values
     lytix.setUserIdentifier("testUser")
     lytix.setSessionId("testSession")
+    lytix.setBackingModel("LLAMA_3_8B_INSTRUCT")
+
+    return modelOutput
 
 
 async def main():
