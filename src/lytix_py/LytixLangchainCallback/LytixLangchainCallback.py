@@ -3,7 +3,7 @@ from langchain_core.outputs.llm_result import LLMResult
 from typing import Any, Dict
 from langchain.callbacks.base import BaseCallbackHandler
 
-from lytix_py.MetricCollector import MetricCollector
+from lytix_py.MetricCollector.MetricCollector import MetricCollector
 
 
 class LytixLangchainCallback(BaseCallbackHandler):
@@ -26,7 +26,7 @@ class LytixLangchainCallback(BaseCallbackHandler):
                 for chunk in self.documentsInChain:
                     MetricCollector._captureRAGChunk(chunk.page_content, lytixEventId)
         except Exception as e:
-            print("Error capturing RAG chunk", e)
+            warnings.warn("Error capturing RAG chunk", e)
 
     def on_chain_end(self, outputs: Dict[str, Any], **kwargs: Any) -> Any:
         """Run when chain ends running."""
@@ -40,6 +40,3 @@ class LytixLangchainCallback(BaseCallbackHandler):
                     allDocuments = False
             if allDocuments:
                 self.documentsInChain.extend(outputs)
-                print("All items in the list are of type Document")
-            else:
-                print("Not all items in the list are of type Document")
