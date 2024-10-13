@@ -18,20 +18,27 @@ class LError(Exception):
             """
             Add a new log with our error
             """
-            error_trace = ''.join(traceback.format_stack())
-            logs.append(json.dumps({
-                "name": "LError",
-                "hostname": "",
-                "pid": -1,
-                "level": 50,
-                "msg": f'Error: {message}\n{error_trace}',
-                "time": datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
-            }))
+            error_trace = "".join(traceback.format_stack())
+            logs.append(
+                json.dumps(
+                    {
+                        "name": "LError",
+                        "hostname": "",
+                        "pid": -1,
+                        "level": 50,
+                        "msg": f"Error: {message}\n{error_trace}",
+                        "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3],
+                    }
+                )
+            )
 
             """
             Send the logs+ metadata to lytix
             """
-            errorMetadata["$no-index:errorMessage"] = message
-            MetricCollector._captureMetricTrace(metricName="LError", metricValue=1, logs=logs, metricMetadata=errorMetadata)
+            MetricCollector._captureLError(
+                errorMsg=message,
+                errorMetadata=errorMetadata,
+                logs=logs,
+            )
         except Exception as e:
-            print('Error sending Lytix metric', e)
+            print("Error sending Lytix metric", e)

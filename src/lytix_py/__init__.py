@@ -4,3 +4,4 @@ from .envVars import LytixCreds
 from .LError import LErrorIncrement, LError
 from .Lytix.Lytix import lytix
 from .Lytix.LytixTest import lytixTest
+from .LytixLangchainCallback.LytixLangchainCallback import LytixLangchainCallback

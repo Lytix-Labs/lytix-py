@@ -15,21 +15,24 @@ def LErrorIncrement(errorMsg: str, errorMetadata: dict = {}):
         """
         Add a new log with our error
         """
-        logs.append(json.dumps({
-            "name": "LError",
-            "hostname": "",
-            "pid": -1,
-            "level": 50,
-            "msg": errorMsg,
-            "time": datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
-        }))
+        logs.append(
+            json.dumps(
+                {
+                    "name": "LError",
+                    "hostname": "",
+                    "pid": -1,
+                    "level": 50,
+                    "msg": errorMsg,
+                    "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3],
+                }
+            )
+        )
 
         """
         Send the logs+ metadata to lytix
         """
-        errorMetadata["$no-index:errorMessage"] = errorMsg
-        MetricCollector._captureMetricTrace(metricName="LError", metricValue=1, logs=logs, metricMetadata=errorMetadata)
+        MetricCollector._captureLError(
+            errorMsg=errorMsg, errorMetadata=errorMetadata, logs=logs
+        )
     except Exception as e:
-        print('Error sending Lytix metric', e)
-
-
+        print("Error sending Lytix metric", e)

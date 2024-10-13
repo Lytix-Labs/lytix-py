@@ -1,3 +1,4 @@
+import datetime
 from typing import Callable, List
 import uuid
 import requests
@@ -16,22 +17,23 @@ from lytix_py.envVars import LytixCreds
 
 
 class _MetricCollector:
-    _baseURL: str = None
-    _baseTestURL: str = None
     processing_metric_mutex: int = 0
 
     def __init__(self):
-        self._baseURL = urljoin(LytixCreds.LX_BASE_URL, "/v2/metrics")
-        self._baseTestURL = urljoin(LytixCreds.LX_BASE_URL, "/v2/test")
         self.processing_metric_mutex = 0
-        pass
+
+    def _get_base_url(self):
+        return urljoin(LytixCreds.LX_BASE_URL, "/v2/metrics")
+
+    def _get_base_test_url(self):
+        return urljoin(LytixCreds.LX_BASE_URL, "/v2/test")
 
     def _sendPostRequest(self, endpoint: str, body: dict, url: str = None):
         """
         Interal wrapper to send a post request
         """
         if url is None:
-            url = self._baseURL
+            url = self._get_base_url()
         urlToUse = os.path.join(url, endpoint)
         headers = {
             "Content-Type": "application/json",
@@ -39,9 +41,10 @@ class _MetricCollector:
         }
         response = requests.post(urlToUse, headers=headers, json=body)
         if response.status_code != 200:
-            raise Exception(
+            print(
                 f"Failed to send post request to {urlToUse} with status code {response.status_code} and response {response.text}"
             )
+
         return response
 
     def _sendGetRequest(self, endpoint: str, url: str = None):
@@ -49,7 +52,7 @@ class _MetricCollector:
         Interal wrapper to send a get request
         """
         if url is None:
-            url = self._baseURL
+            url = self._get_base_url()
         urlToUse = os.path.join(url, endpoint)
         headers = {
             "Content-Type": "application/json",
@@ -168,6 +171,7 @@ class _MetricCollector:
     @note You likeley never need to call this directly
     """
 
+    # @deprecated use _captureLError
     def _captureMetricTrace(
         self,
         metricName: str,
@@ -185,6 +189,24 @@ class _MetricCollector:
         }
 
         self._sendPostRequest("increment", body)
+
+        self.processing_metric_mutex -= 1
+
+    """
+    Capture LError event (logs + metadata)
+    """
+
+    def _captureLError(self, errorMsg: str, errorMetadata: dict = {}, logs: list = []):
+        self.processing_metric_mutex += 1
+
+        body = {
+            "errorName": errorMsg,
+            "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3],
+            "metadata": errorMetadata,
+            "logs": logs,
+        }
+
+        self._sendPostRequest("lerror", body)
 
         self.processing_metric_mutex -= 1
 
@@ -209,7 +231,7 @@ class _MetricCollector:
             "functionName": functionName,
         }
 
-        response = self._sendPostRequest("ioTest", body, url=self._baseTestURL)
+        response = self._sendPostRequest("ioTest", body, url=self._get_base_test_url())
         if response.status_code != 200:
             print(
                 f"🚨 Failed to kickoff test run with status code {response.status_code} and response {response.text}"
@@ -231,7 +253,9 @@ class _MetricCollector:
         """
         Get the status of a test run
         """
-        response = self._sendGetRequest(f"testRun/{testRunId}", url=self._baseTestURL)
+        response = self._sendGetRequest(
+            f"testRun/{testRunId}", url=self._get_base_test_url()
+        )
         return response.json()
 
     def _finalizeTestGroup(self, testSuiteId: str):
@@ -239,7 +263,7 @@ class _MetricCollector:
         Finalize a test group
         """
         response = self._sendPostRequest(
-            f"finalizeTest", {"testSuiteId": testSuiteId}, url=self._baseTestURL
+            f"finalizeTest", {"testSuiteId": testSuiteId}, url=self._get_base_test_url()
         )
         return response.json()
 
@@ -247,9 +271,19 @@ class _MetricCollector:
         """
         Create a test suite
         """
-        response = self._sendGetRequest(f"testSuite", url=self._baseTestURL)
+        response = self._sendGetRequest(f"testSuite", url=self._get_base_test_url())
         result = response.json()
         return result["testSuiteId"]
+
+    def _captureRAGChunk(self, chunkData: str, ioEventId: str):
+        """
+        Capture a RAG chunk
+        """
+        body = {
+            "chunkData": chunkData,
+            "ioEventId": ioEventId,
+        }
+        self._sendPostRequest("ragChunk", body)
 
 
 MetricCollector = _MetricCollector()

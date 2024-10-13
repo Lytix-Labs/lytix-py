@@ -8,7 +8,7 @@ async def backgroundProcess():
         raise Exception("LIncrement error happened")
     except Exception as e:
         logger.error("LIncrement error happened")
-        LErrorIncrement("Some error")
+        LErrorIncrement("TEST_ERROR", {"userId": "124"})
 
 
 async def main():

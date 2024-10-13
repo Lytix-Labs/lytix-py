@@ -58,20 +58,27 @@ class LLogger:
             self.metadata = metadata
 
     def info(self, msg: object):
-        toLog = f"{self.getMetadataLoggerString()}{json.dumps(msg)}"
+        toLog = f"{self.getMetadataLoggerString()}{self.stringify(msg)}"
         self.logger.info(toLog)
 
     def warn(self, msg: object):
-        toLog = f"{self.getMetadataLoggerString()}{json.dumps(msg)}"
+        toLog = f"{self.getMetadataLoggerString()}{self.stringify(msg)}"
         self.logger.warn(toLog)
 
     def error(self, msg: object):
-        toLog = f"{self.getMetadataLoggerString()}{json.dumps(msg)}"
+        toLog = f"{self.getMetadataLoggerString()}{self.stringify(msg)}"
         self.logger.error(toLog)
 
     def debug(self, msg: object):
-        toLog = f"{self.getMetadataLoggerString()}{json.dumps(msg)}"
+        toLog = f"{self.getMetadataLoggerString()}{self.stringify(msg)}"
         self.logger.debug(toLog)
+
+    """"
+    Stringify and remove leading and trailing quotes
+    """
+
+    def stringify(self, msg: object):
+        return json.dumps(msg).strip('"')
 
     """
     Set metadata to be logged
